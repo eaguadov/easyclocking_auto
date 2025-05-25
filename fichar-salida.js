@@ -3,7 +3,12 @@ const { chromium } = require('playwright');
 require('dotenv').config();
 
 (async () => {
-  const browser = await chromium.launch({ headless: true, args: ['--no-sandbox'] });
+  const browser = await chromium.launch({
+  headless: true,
+  args: ['--no-sandbox'],
+  executablePath: '/opt/render/.cache/ms-playwright/chromium-1169/chrome-linux/chrome'
+});
+
   const page = await browser.newPage();
 
   await page.goto('https://easyclocking.net/?ReturnUrl=%2femployee%2ftimecard');
