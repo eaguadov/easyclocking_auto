@@ -1,0 +1,34 @@
+
+const { chromium } = require('playwright');
+const { executablePath } = require('playwright-core/lib/utils/registry');
+require('dotenv').config();
+
+(async () => {
+  const browser = await chromium.launch({
+    headless: true,
+    args: ['--no-sandbox'],
+    executablePath: executablePath('chromium')
+  });
+
+  const page = await browser.newPage();
+
+  await page.goto('https://easyclocking.net/?ReturnUrl=%2femployee%2ftimecard');
+
+  await page.fill('input[name="CompanyID"]', process.env.COMPANY_ID);
+  await page.fill('input[name="UserName"]', process.env.USER_NAME);
+  await page.fill('input[name="Password"]', process.env.PASSWORD);
+  await page.click('button[type="submit"]');
+
+  await page.waitForTimeout(5000);
+
+  const action = process.env.ACTION === "clockout" ? "Clock Out" : "Clock In";
+  const button = await page.$(`text="${action}"`);
+  if (button) {
+    await button.click();
+    console.log(`Fichaje de ${action === "Clock In" ? "entrada" : "salida"} realizado correctamente.`);
+  } else {
+    console.log(`No se encontró el botón ${action}.`);
+  }
+
+  await browser.close();
+})();
