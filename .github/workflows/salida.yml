@@ -1,0 +1,22 @@
+name: Salida manual
+on:
+  workflow_dispatch:
+    schedule:
+      - cron: '0 16 * * 1-4'  # Lunes a jueves a las 18:00 UTC
+      - cron: '0 12 * * 5'    # Viernes a las 14:00 UTC
+jobs:
+  salida:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Instalar dependencias
+        run: npm install
+      - name: Instalar navegadores de Playwright
+        run: npx playwright install --with-deps
+      - name: Ejecutar salida
+        run: npm run salida
+        env:
+          COMPANY_ID: ${{ secrets.COMPANY_ID }}
+          USER_NAME: ${{ secrets.USER_NAME }}
+          PASSWORD: ${{ secrets.PASSWORD }}
+          ACTION: "clockout"
