@@ -11,24 +11,46 @@ require('dotenv').config();
   const action = process.env.ACTION === "clockout" ? "Clock Out" : "Clock In";
 
   try {
-    console.log("🔐 Navegando a la web...");
+    console.log("🔐 Navegando a EasyClocking...");
     await page.goto('https://easyclocking.net/', { timeout: 60000 });
 
-    console.log("📝 Rellenando formulario de login...");
-    await page.waitForSelector('input[name="CompanyCode"]', { timeout: 15000 });
+    console.log("📝 Completando login...");
     await page.fill('input[name="CompanyCode"]', process.env.COMPANY_ID);
     await page.fill('input[name="UserName"]', process.env.USER_NAME);
     await page.fill('input[name="Password"]', process.env.PASSWORD);
     await page.click('input[type="submit"][value="Sign In"]');
 
-    console.log("⏳ Esperando carga de la segunda pantalla...");
-    await page.waitForTimeout(7000); // espera fija adicional
-    await page.waitForSelector(`input[type="button"][value="${action}"]`, { timeout: 30000 });
+    console.log("⏳ Esperando segunda pantalla...");
+    await page.waitForTimeout(8000); // espera adicional por si la carga es lenta
 
-    console.log(`🕒 Pulsando botón "${action}"...`);
-    await page.click(`input[type="button"][value="${action}"]`);
+    const buttonSelector = `input[type="button"][value="${action}"]`;
 
-    console.log("✅ Esperando mensaje de confirmación y pulsando OK...");
+    let retries = 3;
+    let found = false;
+
+    while (retries-- > 0 && !found) {
+      try {
+        console.log(`🔎 Buscando botón "${action}" (intento ${3 - retries})...`);
+        await page.waitForSelector(buttonSelector, { timeout: 20000 });
+        found = true;
+        console.log("✅ Botón localizado.");
+      } catch {
+        console.log("⌛ No se encontró el botón. Reintentando...");
+        await page.waitForTimeout(5000);
+      }
+    }
+
+    if (!found) {
+      console.error("❌ No se encontró el botón tras varios intentos.");
+      console.log("Contenido actual de la página:");
+      console.log(await page.content());
+      process.exit(1);
+    }
+
+    console.log(`🖱️ Pulsando botón "${action}"...`);
+    await page.click(buttonSelector);
+
+    console.log("🪟 Confirmando acción (botón OK)...");
     await page.waitForSelector('span.ui-button-text', { timeout: 15000 });
     await page.click('span.ui-button-text');
 
@@ -36,8 +58,8 @@ require('dotenv').config();
     await page.hover('a.wijmo-wijmenu-link:has-text("Options")');
     await page.click('a[href="/log-off"]');
 
-    console.log(`🎉 Fichaje de ${action === "Clock In" ? "entrada" : "salida"} realizado correctamente.`);
-
+    console.log(`🎉 Proceso de ${action === "Clock In" ? "entrada" : "salida"} completado con éxito.`);
+    
   } catch (error) {
     console.error("❌ Error durante el proceso:", error);
     process.exit(1);
