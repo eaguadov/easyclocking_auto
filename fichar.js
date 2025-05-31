@@ -28,14 +28,14 @@ require('dotenv').config();
   await page.waitForTimeout(5000);
 
   const action = process.env.ACTION === "clockout" ? "Clock Out" : "Clock In";
-  const [button] = await page.$x(`//button[contains(text(), "${action}")]`);
+  const button = await page.locator(`text="${action}"`).first();
 
-  if (button) {
-    await button.click();
-    console.log(`Fichaje de ${action === "Clock In" ? "entrada" : "salida"} realizado correctamente.`);
-  } else {
-    console.log(`No se encontró el botón ${action}.`);
-  }
+if (await button.count() > 0) {
+  await button.click();
+  console.log(`Fichaje de ${action === "Clock In" ? "entrada" : "salida"} realizado correctamente.`);
+} else {
+  console.log(`No se encontró el botón ${action}.`);
+}
 
   await browser.close();
 })();
