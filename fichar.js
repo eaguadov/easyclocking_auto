@@ -6,20 +6,30 @@ require('dotenv').config();
     headless: true,
     args: ['--no-sandbox']
   });
+
   const page = await browser.newPage();
 
-  await page.goto('https://easyclocking.net');
-  await page.waitForSelector('input[name="CompanyID"]');
+  await page.goto('https://easyclocking.net/');
 
-  await page.fill('input[name="CompanyID"]', process.env.COMPANY_ID);
+  // Esperar a que todos los campos estén visibles
+  await page.waitForSelector('input[name="CompanyCode"]');
+  await page.waitForSelector('input[name="UserName"]');
+  await page.waitForSelector('input[name="Password"]');
+
+  // Rellenar campos del login
+  await page.fill('input[name="CompanyCode"]', process.env.COMPANY_ID);
   await page.fill('input[name="UserName"]', process.env.USER_NAME);
   await page.fill('input[name="Password"]', process.env.PASSWORD);
-  await page.click('button[type="submit"]');
 
+  // Pulsar el botón "Sign In"
+  await page.click('input[type="submit"][value="Sign In"]');
+
+  // Esperar a que se cargue la página de fichaje (ajustar según selector futuro si necesario)
   await page.waitForTimeout(5000);
 
   const action = process.env.ACTION === "clockout" ? "Clock Out" : "Clock In";
   const [button] = await page.$x(`//button[contains(text(), "${action}")]`);
+
   if (button) {
     await button.click();
     console.log(`Fichaje de ${action === "Clock In" ? "entrada" : "salida"} realizado correctamente.`);
