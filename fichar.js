@@ -8,7 +8,8 @@ require('dotenv').config();
   });
   const page = await browser.newPage();
 
-  await page.goto('https://easyclocking.net/?ReturnUrl=%2femployee%2ftimecard');
+  await page.goto('https://easyclocking.net');
+  await page.waitForSelector('input[name="CompanyID"]');
 
   await page.fill('input[name="CompanyID"]', process.env.COMPANY_ID);
   await page.fill('input[name="UserName"]', process.env.USER_NAME);
