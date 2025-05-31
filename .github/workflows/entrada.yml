@@ -1,0 +1,20 @@
+name: Entrada manual
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '30 6 * * 1-4'  # Lunes a jueves a las 08:30 (UTC+2)
+    - cron: '0 6 * * 5'     # Viernes a las 08:00 (UTC+2)
+
+jobs:
+  entrada:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Instalar dependencias
+        run: npm install
+      - name: Ejecutar entrada
+        run: npm run entrada
+        env:
+          COMPANY_ID: ${{ secrets.COMPANY_ID }}
+          USER_NAME: ${{ secrets.USER_NAME }}
+          PASSWORD: ${{ secrets.PASSWORD }}
