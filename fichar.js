@@ -54,12 +54,19 @@ require('dotenv').config();
     await page.waitForSelector('span.ui-button-text', { timeout: 15000 });
     await page.click('span.ui-button-text');
 
+    // Esperar a que desaparezca cualquier overlay antes del logout
+    console.log("🧼 Esperando desaparición del overlay...");
+    await page.waitForSelector('.ui-dialog-overlay', { state: 'detached', timeout: 10000 });
+
     console.log("🚪 Cerrando sesión...");
-    await page.hover('a.wijmo-wijmenu-link:has-text("Options")');
-    await page.click('a[href="/log-off"]');
+    const optionsLink = page.locator('a.wijmo-wijmenu-link:has-text("Options")');
+    await optionsLink.waitFor({ state: 'visible', timeout: 10000 });
+    await optionsLink.hover();
+    await page.waitForTimeout(1000); // pausa tras hover
+    await page.click('a:has-text("Log Off")');
 
     console.log(`🎉 Proceso de ${action === "Clock In" ? "entrada" : "salida"} completado con éxito.`);
-    
+
   } catch (error) {
     console.error("❌ Error durante el proceso:", error);
     process.exit(1);
