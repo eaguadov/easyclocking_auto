@@ -15,7 +15,7 @@ const { chromium } = require('playwright');
     await page.goto('https://easyclocking.net', { timeout: 60000 });
 
     console.log("📝 Completando login...");
-    const companyIdInput = await page.$('input[name="CompanyId"]');
+    const companyIdInput = await page.$('input#CompanyCode[name="CompanyCode"]');
     if (companyIdInput) {
       console.log("🏢 Campo CompanyId encontrado. Rellenando...");
       await companyIdInput.fill(COMPANY_ID);
