@@ -21,6 +21,7 @@ jobs:
 
       - name: Ejecutar salida
         run: npm run salida
+        
         env:
           COMPANY_ID: ${{ secrets.COMPANY_ID }}
           USER_NAME: ${{ secrets.USER_NAME }}
@@ -29,7 +30,7 @@ jobs:
 
       - name: Subir capturas de pantalla si falla
         if: failure()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v2
         with:
           name: capturas-fallo
           path: |
