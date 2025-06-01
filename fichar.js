@@ -27,8 +27,15 @@ const { chromium } = require('playwright');
     await page.fill('input[name="Password"]', PASSWORD);
     await page.click('input[type="submit"][value="Sign In"]');
 
-    console.log("⏳ Esperando segunda pantalla...");
-    await page.waitForURL('**/employee/timecard', { timeout: 60000 });
+    console.log("🔍 Esperando segunda pantalla (Clock In / Clock Out)...");
+    try {
+      await page.waitForSelector('button:has-text("Clock In"), button:has-text("Clock Out")', { timeout: 120000 });
+      console.log("✅ Segunda pantalla cargada con éxito.");
+    } catch (error) {
+      console.error("❌ No se detectó el botón Clock In / Clock Out:", error);
+      await page.screenshot({ path: 'error-segunda-pantalla.png' });
+      process.exit(1);
+    }
 
     console.log(`🕒 Buscando botón "${ACTION}"...`);
     await page.waitForSelector(`input[type="button"][value="${ACTION}"]`, { timeout: 60000 });
