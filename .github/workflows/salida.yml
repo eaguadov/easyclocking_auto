@@ -1,14 +1,9 @@
 name: salida manual
-
 on:
   workflow_dispatch:
-  schedule:
-    - cron: '0 16 * * 1-4'   # Lunes a jueves a las 18:00 (UTC = 20:00 CET)
-    - cron: '0 12 * * 5'     # Viernes a las 14:00 (UTC = 16:00 CET)
-
-permissions:
-  contents: read
-  actions: write
+    schedule:
+      - cron: '0 16 * * 1-4'   # Lunes a jueves a las 18:00 (UTC = 20:00 CET)
+      - cron: '0 12 * * 5'     # Viernes a las 14:00 (UTC = 16:00 CET)
 
 jobs:
   salida:
@@ -29,12 +24,3 @@ jobs:
           COMPANY_ID: ${{ secrets.COMPANY_ID }}
           USER_NAME: ${{ secrets.USER_NAME }}
           PASSWORD: ${{ secrets.PASSWORD }}
-          ACTION: clockout
-
-      - name: Subir capturas de pantalla si falla
-        if: failure()
-        uses: actions/upload-artifact@v3
-        with:
-          name: capturas-fallo
-          path: |
-            *.png
