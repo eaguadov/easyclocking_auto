@@ -37,18 +37,35 @@ const PASSWORD = process.env.PASSWORD;
       process.exit(1);
     }
 
-    // Esperar y clicar botón de fichaje
-    console.log("🖱️ Clicando botón de fichaje...");
-    await page.waitForSelector('input#clocktime', { timeout: 60000 });
-    await page.click('input#clocktime');
+    // Esperar botón Clock In / Clock Out
+    let retries = 3;
+    while (retries-- > 0) {
+      try {
+        await page.waitForSelector('button:has-text("Clock In"), button:has-text("Clock Out")', { timeout: 60000 });
+        console.log("✅ Botón Clock In / Out encontrado.");
+        break;
+      } catch (error) {
+        if (retries === 0) {
+          console.error("❌ Botón Clock In / Out no detectado:", error);
+          await page.screenshot({ path: 'no-clock-button.png' });
+          process.exit(1);
+        }
+        console.log("🔄 Reintentando detección de botón...");
+        await page.waitForTimeout(5000);
+      }
+    }
 
-    // Confirmación (modal OK)
+    // Clic en Clock In o Clock Out
+    console.log("🖱️ Clicando botón de fichaje...");
+    await page.click('button:has-text("Clock In"), button:has-text("Clock Out")');
+
+    // Confirmación (OK Clock In/Out)
     console.log("✅ Esperando botón de confirmación...");
-    await page.waitForSelector('button:has-text("OK")', { timeout: 15000 });
-    await page.click('button:has-text("OK")');
+    await page.waitForSelector('button:has-text("OK Clock In"), button:has-text("OK Clock Out")', { timeout: 15000 });
+    await page.click('button:has-text("OK Clock In"), button:has-text("OK Clock Out")');
     console.log("📌 Fichaje confirmado.");
 
-    // Esperar desaparición de overlay
+    // Esperar que desaparezca el overlay
     let overlayRetries = 3;
     while (overlayRetries-- > 0) {
       try {
@@ -69,7 +86,7 @@ const PASSWORD = process.env.PASSWORD;
     // Menú de opciones y log off
     const optionsLink = page.locator('a.wijmo-wijmenu-link:has-text("Options")').nth(0);
     await optionsLink.waitFor({ state: 'visible', timeout: 30000 });
-    await optionsLink.click();  // Usar click en lugar de hover
+    await optionsLink.hover();
     console.log("📂 Menú Options abierto.");
 
     const logOff = page.locator('a:has-text("Log Off")');
