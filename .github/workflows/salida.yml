@@ -1,7 +1,7 @@
 name: salida
 
 on:
-  schedule:
+  workflow_dispatch:
     - cron: '0 16 * * 1-4'   # Lunes a jueves a las 18:00 (UTC = 20:00 CET)
     - cron: '0 12 * * 5'     # Viernes a las 14:00 (UTC = 16:00 CET)
 
