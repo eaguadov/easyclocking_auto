@@ -27,14 +27,30 @@ const { chromium } = require('playwright');
     await page.fill('input[name="Password"]', PASSWORD);
     await page.click('input[type="submit"][value="Sign In"]');
 
-    console.log("🔍 Esperando segunda pantalla (Clock In / Clock Out)...");
-    try {
-      await page.waitForSelector('button:has-text("Clock In"), button:has-text("Clock Out")', { timeout: 120000 });
-      console.log("✅ Segunda pantalla cargada con éxito.");
-    } catch (error) {
-      console.error("❌ No se detectó el botón Clock In / Clock Out:", error);
-      await page.screenshot({ path: 'error-segunda-pantalla.png' });
-      process.exit(1);
+    console.log("📷 Capturando pantalla antes de esperar el botón...");
+    await page.screenshot({ path: 'before-clock-button.png' });
+
+    let retries = 3;
+    while (retries-- > 0) {
+      try {
+        console.log("🔍 Esperando segunda pantalla (Clock In / Clock Out)...");
+        await page.waitForSelector('input[type="button"][value="Clock In"], input[type="button"][value="Clock Out"]', {
+          timeout: 60000
+        });
+        console.log("✅ Segunda pantalla cargada con éxito.");
+        break;
+      } catch (error) {
+        if (retries === 0) {
+          console.error("❌ No se detectó el botón Clock In / Clock Out:", error);
+          const html = await page.content();
+          console.error("📄 HTML actual:", html);
+          await page.screenshot({ path: 'error-segunda-pantalla.png' });
+          process.exit(1);
+        } else {
+          console.log("⏳ Reintentando detección de botón...");
+          await page.waitForTimeout(5000);
+        }
+      }
     }
 
     console.log(`🕒 Buscando botón "${ACTION}"...`);
@@ -71,6 +87,7 @@ const { chromium } = require('playwright');
     console.log("🏁 Proceso completado correctamente.");
   } catch (error) {
     console.error("❌ Error general en el proceso:", error);
+    await page.screenshot({ path: 'error-general.png' });
     process.exit(1);
   } finally {
     await browser.close();
