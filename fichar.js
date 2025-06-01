@@ -11,7 +11,7 @@ const PASSWORD = process.env.PASSWORD;
 
   try {
     console.log("🌐 Navegando a la página de inicio de sesión...");
-    await page.goto('https://easyclocking.net/usa/');
+    await page.goto('https://easyclocking.net');
     await page.waitForLoadState('networkidle');
 
     // Login adaptativo (puede o no aparecer CompanyId)
