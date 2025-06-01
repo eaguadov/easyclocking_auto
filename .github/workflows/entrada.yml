@@ -19,4 +19,3 @@ jobs:
           COMPANY_ID: ${{ secrets.COMPANY_ID }}
           USER_NAME: ${{ secrets.USER_NAME }}
           PASSWORD: ${{ secrets.PASSWORD }}
-          ACTION: "clockin"
