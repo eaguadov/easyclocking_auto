@@ -41,7 +41,7 @@ const PASSWORD = process.env.PASSWORD;
     let retries = 3;
     while (retries-- > 0) {
       try {
-        await page.waitForSelector('button:has-text("Clock In"), button:has-text("Clock Out")', { timeout: 60000 });
+        await page.waitForSelector('input#clocktime', { timeout: 60000 });
         console.log("✅ Botón Clock In / Out encontrado.");
         break;
       } catch (error) {
@@ -55,15 +55,19 @@ const PASSWORD = process.env.PASSWORD;
       }
     }
 
+console.log("🖱️ Clicando botón de fichaje...");
+await page.click('input#clocktime');
+
     // Clic en Clock In o Clock Out
     console.log("🖱️ Clicando botón de fichaje...");
     await page.click('button:has-text("Clock In"), button:has-text("Clock Out")');
 
     // Confirmación (OK Clock In/Out)
     console.log("✅ Esperando botón de confirmación...");
-    await page.waitForSelector('button:has-text("OK Clock In"), button:has-text("OK Clock Out")', { timeout: 15000 });
-    await page.click('button:has-text("OK Clock In"), button:has-text("OK Clock Out")');
+    await page.waitForSelector('button:has-text("OK")', { timeout: 15000 });
+    await page.click('button:has-text("OK")');
     console.log("📌 Fichaje confirmado.");
+
 
     // Esperar que desaparezca el overlay
     let overlayRetries = 3;
